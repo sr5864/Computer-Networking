@@ -7,7 +7,7 @@ def webServer(port=13331):
 
     #Prepare a sever socket
     # Fill in start
-    serverSocket.bind(('localhost', port))
+    serverSocket.bind(('', port))
     serverSocket.listen(10)
     # Fill in end
 
@@ -16,7 +16,7 @@ def webServer(port=13331):
         print('Ready to serve...')
         connectionSocket, addr = serverSocket.accept()
         try:
-            message = connectionSocket.recv()
+            message = connectionSocket.recv(1024)
             # Fill in start    #Fill in end
             filename = message.split()[1]
             f = open(filename[1:])
