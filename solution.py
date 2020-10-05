@@ -19,19 +19,6 @@ def smtp_client(port=1025, mailserver='127.0.0.1'):
     #print(recv)
     if recv[:3] != '220':
         #print('220 reply not received from server.')
-    username = 'myusername@gmail.com'
-    password = 'mypassword'
-    authMsg = "AUTH LOGIN\r\n"
-    clientSocket.send(authMsg.encode())
-    recv_auth = clientSocket.recv(1024)
-
-    clientSocket.send(username.encode())
-    clientSocket.send("\r\n".encode())
-    recv_user = clientSocket.recv(1024)
-
-    clientSocket.send(password.encode())
-    clientSocket.send("\r\n".encode())
-    recv_pass = clientSocket.recv(1024)
 
 
     # Send HELO command and print server response.
