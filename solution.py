@@ -10,15 +10,38 @@ def smtp_client(port=1025, mailserver='127.0.0.1'):
 
     # Create socket called clientSocket and establish a TCP connection with mailserver and port
 
+
     # Fill in start
     clientSocket = socket(AF_INET, SOCK_STREAM)
     clientSocket.connect((mailserver, port))
+    username = 'myusername@gmail.com'
+    password = 'mypassword'
+    authMsg = "AUTH LOGIN\r\n"
+    clientSocket.send(authMsg.encode())
+    recv_auth = clientSocket.recv(1024)
+    #print(recv_auth.decode())
+
+    clientSocket.send(username.encode())
+    clientSocket.send("\r\n".encode())
+    recv_user = clientSocket.recv(1024)
+    #print("Response after sending username: " + recv_user.decode())
+
+    clientSocket.send(password.encode())
+    clientSocket.send("\r\n".encode())
+    recv_pass = clientSocket.recv(1024)
+    #print("Response after sending password: " + recv_pass.decode())
+
+    clientSocket.send(('starttls\r\n').encode())
+    recv_tls = clientSocket.recv(1024)
+    # print(recv_tls.decode())
+
     # Fill in end
 
     recv = clientSocket.recv(1024).decode()
     #print(recv)
     if recv[:3] != '220':
-        #print('220 reply not received from server.')
+        print('220 reply not received from server.')
+
 
 
     # Send HELO command and print server response.
@@ -27,7 +50,7 @@ def smtp_client(port=1025, mailserver='127.0.0.1'):
     recv1 = clientSocket.recv(1024).decode()
     #print(recv1)
     if recv1[:3] != '250':
-        #print('250 reply not received from server.')
+        print('250 reply not received from server.')
 
     # Send MAIL FROM command and print server response.
     # Fill in start
