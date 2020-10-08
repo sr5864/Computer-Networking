@@ -16,60 +16,69 @@ def smtp_client(port=1025, mailserver='127.0.0.1'):
     # Fill in end
 
     recv = clientSocket.recv(1024).decode()
-    #print(recv)
+    # print(recv)
+    # print('1\r\n')
     if recv[:3] != '220':
         pass
-        #print('220 reply not received from server.')
+        # print('220 reply not received from server.')
 
     # Send HELO command and print server response.
-    heloCommand = 'HELO Alice\r\n'
-    clientSocket.send(heloCommand.encode())
+    helocommand = 'HELO Alice\r\n'
+    clientSocket.send(helocommand.encode())
     recv1 = clientSocket.recv(1024).decode()
-    #print(recv1)
+    # print(recv1)
+    # print('2\r\n')
     if recv1[:3] != '250':
         pass
-        #print('250 reply not received from server.')
+        # print('250 reply not received from server.')
+    
 
     # Send MAIL FROM command and print server response.
     # Fill in start
-    mailFromCommand = 'Mail From: <sr5864@nyu.edu>\r\n'
-    clientSocket.send(mailFromCommand.encode())
+    mailfromcommand = 'Mail From: <sr5864@nyu.edu>\r\n'
+    clientSocket.send(mailfromcommand.encode())
     recv2 = clientSocket.recv(1024).decode()
-    #print(recv2)
+    # print(recv2)
+    # print('3\r\n')
     # Fill in end
 
     # Send RCPT TO command and print server response.
     # Fill in start
-    rcptToCommand = 'RCPT TO: <sr5864@nyu.edu>\r\n'
-    clientSocket.send(rcptToCommand.encode())
+    rcpttocommand = 'RCPT TO: <sr5864@nyu.edu>\r\n'
+    clientSocket.send(rcpttocommand.encode())
     recv3 = clientSocket.recv(1024).decode()
-    #print(recv3)
+    # print(recv3)
+    # print('4\r\n')
     # Fill in end
 
     # Send DATA command and print server response.
     # Fill in start
-    dataCommand = 'Data\r\n'
-    clientSocket.send(dataCommand.encode())
+    datacommand = 'Data\r\n'
+    clientSocket.send(datacommand.encode())
     recv4 = clientSocket.recv(1024).decode()
-    #print(recv4)
+    # print(recv4)
+    # print('5\r\n')
     # Fill in end
 
     # Send message data.
     # Fill in start
     clientSocket.send(msg.encode())
+    # print('6\r\n')
     # Fill in end
 
     # Message ends with a single period.
     # Fill in start
     clientSocket.send(endmsg.encode())
+    # print('7\r\n')
     # Fill in end
 
     # Send QUIT command and get server response.
     # Fill in start
-    quitCommand = 'Quit\r\n'
-    clientSocket.send(quitCommand.encode())
+    quitcommand = 'Quit\r\n'
+    clientSocket.send(quitcommand.encode())
     recv5 = clientSocket.recv(1024).decode()
-    #print(recv5)
+    # print(recv5)
+    # print('8\r\n')
     # Fill in end
 
 
