@@ -25,37 +25,37 @@ def smtp_client(port=1025, mailserver='127.0.0.1'):
     # Send HELO command and print server response.
     helocommand = 'HELO Alice\r\n'
     clientSocket.send(helocommand.encode())
-    recv = clientSocket.recv(1024).decode()
+    recv1 = clientSocket.recv(1024).decode()
     # print(recv1)
     # print('2\r\n')
-    if recv[:3] != '250':
+    if recv1[:3] != '250':
         pass
         # print('250 reply not received from server.')
-
+    
 
     # Send MAIL FROM command and print server response.
     # Fill in start
-    mailfrom = 'Mail From: <sr5864@nyu.edu>\r\n'
-    clientSocket.send(mailfrom.encode())
-    recv = clientSocket.recv(1024).decode()
+    mailfromcommand = 'Mail From: <sr5864@nyu.edu>\r\n'
+    clientSocket.send(mailfromcommand.encode())
+    recv2 = clientSocket.recv(1024).decode()
     # print(recv2)
     # print('3\r\n')
     # Fill in end
 
     # Send RCPT TO command and print server response.
     # Fill in start
-    rcptto = 'RCPT TO: <sr5864@nyu.edu>\r\n'
-    clientSocket.send(rcptto.encode())
-    recv = clientSocket.recv(1024).decode()
+    rcpttocommand = 'RCPT TO: <sr5864@nyu.edu>\r\n'
+    clientSocket.send(rcpttocommand.encode())
+    recv3 = clientSocket.recv(1024).decode()
     # print(recv3)
     # print('4\r\n')
     # Fill in end
 
     # Send DATA command and print server response.
     # Fill in start
-    data = 'Data\r\n'
-    clientSocket.send(data.encode())
-    recv = clientSocket.recv(1024).decode()
+    datacommand = 'Data\r\n'
+    clientSocket.send(datacommand.encode())
+    recv4 = clientSocket.recv(1024).decode()
     # print(recv4)
     # print('5\r\n')
     # Fill in end
@@ -74,9 +74,9 @@ def smtp_client(port=1025, mailserver='127.0.0.1'):
 
     # Send QUIT command and get server response.
     # Fill in start
-    quit = 'Quit\r\n'
-    clientSocket.send(quit.encode())
-    recv = clientSocket.recv(1024).decode()
+    quitcommand = 'Quit\r\n'
+    clientSocket.send(quitcommand.encode())
+    recv5 = clientSocket.recv(1024).decode()
     # print(recv5)
     # print('8\r\n')
     # Fill in end
