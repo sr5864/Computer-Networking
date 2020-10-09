@@ -19,8 +19,8 @@ def smtp_client(port=1025, mailserver='127.0.0.1'):
     # print(recv)
     # print('1\r\n')
     if recv[:3] != '220':
-        pass
-        # print('220 reply not received from server.')
+        # pass
+        print('220 reply not received from server.')
 
     # Send HELO command and print server response.
     helocommand = 'HELO Alice\r\n'
@@ -29,8 +29,8 @@ def smtp_client(port=1025, mailserver='127.0.0.1'):
     # print(recv1)
     # print('2\r\n')
     if recv1[:3] != '250':
-        pass
-        # print('250 reply not received from server.')
+        # pass
+        print('250 reply not received from server.')
     
 
     # Send MAIL FROM command and print server response.
