@@ -50,14 +50,18 @@ def receiveOnePing(mySocket, ID, timeout, destAddr):
         # Fill in start
 
         # Fetch the ICMP header from the IP packet
-        ICMPHeader = recPacket[20:28]
-        Type, Code, Checksum, packetID, Sequence = struct.unpack('bbHHh', ICMPHeader)
-        if packetID == ID:
-            BytesInDouble = struct.calcsize('d')
-            timeSent = struct.unpack('d', recPacket[28:28 + BytesInDouble])[0]
-            return timeReceived - timeSent
+        icmpHeader = recPacket[20:28]
+        requestType, code, revChecksum, revId, revSequence = struct.unpack('bbHHh',icmpHeader)
+        if ID == revId:
+            bytesInDouble = struct.calcsize('d')
+            #struct.calcsize(fmt) Return the size of the struct (and hence of the string) corresponding to the given format.
+        #struct.unpack(fmt, buffer[, offset=0]) Unpack the buffer according to the given format. The result is a tuple even if it contains exactly one item. The buffer must contain at least the amount of data required by the format (len(buffer[offset:]) must be at least calcsize(fmt)).
+            timeData = struct.unpack('d',recPacket[28:28 + bytesInDouble])[0] 
+            timeRTT.append(timeReceived - timeData)
+            packageRev += 1
+            return timeReceived - timeData
         else:
-            return 'Different ID'
+            return "ID does not match"
 
         # Fill in end
         timeLeft = timeLeft - howLongInSelect
