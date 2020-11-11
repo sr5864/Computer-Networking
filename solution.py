@@ -53,13 +53,13 @@ def receiveOnePing(mySocket, ID, timeout, destAddr):
         icmph = recPacket[20:28]
         type, code, checksum, pID, sq = struct.unpack("bbHHh", icmph)
 
-        print("ICMP Header: ", type, code, checksum, pID, sq)
+        # print("ICMP Header: ", type, code, checksum, pID, sq)
         if pID == ID:
             bytesinDbl = struct.calcsize("d")
             timeSent = struct.unpack("d", recPacket[28:28 + bytesinDbl])[0]
             rtt = timeReceived - timeSent
 
-            print("Round-Trip Time: ")
+            # print("Round-Trip Time: ")
             return rtt
         else:
             return 'ID is not the same!'
