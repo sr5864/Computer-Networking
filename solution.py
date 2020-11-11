@@ -7,7 +7,7 @@ import select
 import binascii
 # Should use stdev
 
-ICMP_ECHO_REQUEST = 8 
+ICMP_ECHO_REQUEST = 8
 
 
 def checksum(string):
@@ -50,19 +50,18 @@ def receiveOnePing(mySocket, ID, timeout, destAddr):
         # Fill in start
 
         # Fetch the ICMP header from the IP packet
-        header = recPacket[20: 28]
-        type, code, checksum, packetID, sequence = struct.unpack("bbHHh", header)
-        if packetID == ID:  # type should be 0
-            byte_in_double = struct.calcsize("d")
-            timeSent = struct.unpack("d", recPacket[28: 28 + byte_in_double])[0]
-            delay = timeReceived - timeSent
-            ttl = ord(struct.unpack("c", recPacket[8:9])[0].decode())
-            return (delay, ttl, byte_in_double)
+        ip_header = recPacket[0:20]
+        (resp_type, res_code, resp_checksum, resp_id, resp_seq) = struct.unpack('bbHHh', recPacket[20:28])
+        if not resp_id == ID:
+            continue
+        if resp_type == 0:
+            (req_time,) = struct.unpack('d', recPacket[28:36])
 
         # Fill in end
         timeLeft = timeLeft - howLongInSelect
         if timeLeft <= 0:
             return "Request timed out."
+
 
 
 def sendOnePing(mySocket, destAddr, ID):
@@ -105,6 +104,15 @@ def doOnePing(destAddr, timeout):
     sendOnePing(mySocket, destAddr, myID)
     delay = receiveOnePing(mySocket, myID, timeout, destAddr)
     mySocket.close()
+    return delay
+
+def simple_ping(host, count=10, timeout=1):
+    dest = socket.gethostbyname(host)
+    # print "Pinging " + dest + " using Python:"
+    for i in range(count):
+        delay = doOnePing(dest, timeout)
+        # print delay
+        time.sleep(1)
     return delay
 
 
