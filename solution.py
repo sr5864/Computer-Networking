@@ -55,16 +55,16 @@ def receiveOnePing(mySocket, ID, timeout, destAddr):
         type, code, checksum, pID, sq = struct.unpack("bbHHh", icmph)
 
         # print("ICMP Header: ", type, code, checksum, pID, sq)
-        trans_time, = struct.unpack('d', received_Packet[28:])
+        trans_time, = struct.unpack('d', recPacket[28:])
         roundTrip = (timeReceived - trans_time) * 1000
         roundTrip_cnt += 1
         roundTrip_sum += roundTrip
         roundTrip_min = min(roundTrip_min, roundTrip)
         roundTrip_max = max(roundTrip_max, roundTrip)
-        ip_pkt_head = struct.unpack('!BBHHHBBH4s4s', received_Packet[:20])
+        ip_pkt_head = struct.unpack('!BBHHHBBH4s4s', recPacket[:20])
         ttl = ip_pkt_head[5]
         saddr = socket.inet_ntoa(ip_pkt_head[8])
-        length = len(received_Packet) - 20
+        length = len(recPacket) - 20
         return '{} bytes from {}: icmp_seq={} ttl={} time={:.3f} ms'.format(length, saddr, seq, ttl, roundTrip)
         # Fill in end
         timeLeft = timeLeft - howLongInSelect
