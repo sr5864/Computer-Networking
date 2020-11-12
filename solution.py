@@ -35,6 +35,7 @@ def checksum(string):
 
 
 def receiveOnePing(mySocket, ID, timeout, destAddr):
+    global roundTrip_min, roundTrip_max, roundTrip_sum, roundTrip_cnt
     timeLeft = timeout
 
     while 1:
@@ -54,15 +55,17 @@ def receiveOnePing(mySocket, ID, timeout, destAddr):
         type, code, checksum, pID, sq = struct.unpack("bbHHh", icmph)
 
         # print("ICMP Header: ", type, code, checksum, pID, sq)
-        if type != 8 and pID == ID:
-            bytesinDbl = struct.calcsize("d")
-            timeSent = struct.unpack("d", recPacket[28:28 + bytesinDbl])[0]
-            rtt = timeReceived - timeSent
-
-            # print("Round-Trip Time: ")
-            return rtt
-        # else:
-        #    return 'ID is not the same!'
+        trans_time, = struct.unpack('d', received_Packet[28:])
+        roundTrip = (timeReceived - trans_time) * 1000
+        roundTrip_cnt += 1
+        roundTrip_sum += roundTrip
+        roundTrip_min = min(roundTrip_min, roundTrip)
+        roundTrip_max = max(roundTrip_max, roundTrip)
+        ip_pkt_head = struct.unpack('!BBHHHBBH4s4s', received_Packet[:20])
+        ttl = ip_pkt_head[5]
+        saddr = socket.inet_ntoa(ip_pkt_head[8])
+        length = len(received_Packet) - 20
+        return '{} bytes from {}: icmp_seq={} ttl={} time={:.3f} ms'.format(length, saddr, seq, ttl, roundTrip)
         # Fill in end
         timeLeft = timeLeft - howLongInSelect
         if timeLeft <= 0:
@@ -117,6 +120,11 @@ def doOnePing(destAddr, timeout):
 
 def ping(host, timeout=1):
     # timeout=1 means: If one second goes by without a reply from the server,  	# the client assumes that either the client's ping or the server's pong is lost
+    global roundTrip_min, roundTrip_max, roundTrip_sum, roundTrip_cnt
+    roundTrip_min = float('+inf')
+    roundTrip_max = float('-inf')
+    roundTrip_sum = 0
+    roundTrip_cnt = 0
     dest = gethostbyname(host)
     print("Pinging " + dest + " using Python:")
     print("")
