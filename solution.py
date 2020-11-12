@@ -11,6 +11,7 @@ ICMP_ECHO_REQUEST = 8
 
 
 def checksum(string):
+    string = bytearray(string)
     csum = 0
     countTo = (len(string) // 2) * 2
     count = 0
@@ -54,15 +55,15 @@ def receiveOnePing(mySocket, ID, timeout, destAddr):
         type, code, checksum, pID, sq = struct.unpack("bbHHh", icmph)
 
         # print("ICMP Header: ", type, code, checksum, pID, sq)
-        if pID == ID:
+        if type != 8 and pID == ID:
             bytesinDbl = struct.calcsize("d")
             timeSent = struct.unpack("d", recPacket[28:28 + bytesinDbl])[0]
             rtt = timeReceived - timeSent
 
             # print("Round-Trip Time: ")
             return rtt
-        else:
-            return 'ID is not the same!'
+        # else:
+        #    return 'ID is not the same!'
         # Fill in end
         timeLeft = timeLeft - howLongInSelect
         if timeLeft <= 0:
@@ -112,14 +113,7 @@ def doOnePing(destAddr, timeout):
     mySocket.close()
     return delay
 
-def simple_ping(host, count=10, timeout=1):
-    dest = socket.gethostbyname(host)
-    # print "Pinging " + dest + " using Python:"
-    for i in range(count):
-        delay = doOnePing(dest, timeout)
-        # print delay
-        time.sleep(1)
-    return delay
+
 
 
 def ping(host, timeout=1):
