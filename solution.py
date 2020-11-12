@@ -8,6 +8,9 @@ import binascii
 # Should use stdev
 
 ICMP_ECHO_REQUEST = 8
+timeRTT = []
+packageSent = 0
+packageRev = 0
 
 
 def checksum(string):
@@ -35,6 +38,7 @@ def checksum(string):
 
 
 def receiveOnePing(mySocket, ID, timeout, destAddr):
+    global packageRev, timeRTT
     timeLeft = timeout
 
     while 1:
@@ -50,14 +54,18 @@ def receiveOnePing(mySocket, ID, timeout, destAddr):
         # Fill in start
 
         # Fetch the ICMP header from the IP packet
-        header = recPacket[20: 28]
-        type, code, checksum, packetID, sequence = struct.unpack("!bbHHh", header)
-        if type == 0 and packetID == ID:  # type should be 0
-            byte_in_double = struct.calcsize("!d")
-            timeSent = struct.unpack("!d", recPacket[28: 28 + byte_in_double])[0]
-            delay = timeReceived - timeSent
-            ttl = ord(struct.unpack("!c", recPacket[8:9])[0].decode())
-            return (delay, ttl, byte_in_double)
+        icmpHeader = recPacket[20:28]
+        (requestType, code, revChecksum, revId, revSequence) = \
+            struct.unpack('bbHHh', icmpHeader)
+        if ID == revId:
+            bytesInDouble = struct.calcsize('d')
+            timeData = struct.unpack('d', recPacket[28:28
+                                                       + bytesInDouble])[0]
+            timeRTT.append(timeReceived - timeData)
+            packageRev += 1
+            return timeReceived - timeData
+        else:
+            return 'ID is not the same!'
 
         # Fill in end
         timeLeft = timeLeft - howLongInSelect
@@ -66,6 +74,7 @@ def receiveOnePing(mySocket, ID, timeout, destAddr):
 
 
 def sendOnePing(mySocket, destAddr, ID):
+    global packageSent
     # Header is type (8), code (8), checksum (16), id (16), sequence (16)
 
     myChecksum = 0
@@ -89,7 +98,7 @@ def sendOnePing(mySocket, destAddr, ID):
     packet = header + data
 
     mySocket.sendto(packet, (destAddr, 1))  # AF_INET address must be tuple, not str
-
+    packageSent += 1
 
     # Both LISTS and TUPLES consist of a number of objects
     # which can be referenced by their position number within the object.
