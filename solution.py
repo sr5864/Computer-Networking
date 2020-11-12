@@ -9,6 +9,9 @@ import binascii
 
 ICMP_ECHO_REQUEST = 8
 
+roundTripTimeLog = []
+sent = 0
+received = 0
 
 def checksum(string):
     csum = 0
@@ -35,7 +38,8 @@ def checksum(string):
 
 
 def receiveOnePing(mySocket, ID, timeout, destAddr):
-    global roundTrip_min, roundTrip_max, roundTrip_sum, roundTrip_cnt
+    global received
+    global roundTripTimeLog
     timeLeft = timeout
 
     while 1:
@@ -51,20 +55,21 @@ def receiveOnePing(mySocket, ID, timeout, destAddr):
         # Fill in start
 
         # Fetch the ICMP header from the IP packet
-        icmph = recPacket[20:28]
-        type, code, checksum, pID, sq = struct.unpack("bbHHh", icmph)
-
-        # print("ICMP Header: ", type, code, checksum, pID, sq)
-        trans_time, = struct.unpack('d', recPacket[28:])
-        roundTrip = (timeReceived - trans_time) * 1000
-        roundTrip_cnt += 1
-        roundTrip_sum += roundTrip
-        roundTrip_min = min(roundTrip_min, roundTrip)
-        roundTrip_max = max(roundTrip_max, roundTrip)
-        ip_pkt_head = struct.unpack('!BBHHHBBH4s4s', recPacket[:20])
-        ttl = ip_pkt_head[5]
-        length = len(recPacket) - 20
-        return '{} bytes from {}: icmp_seq={} ttl={} time={:.3f} ms'.format(length, ttl, roundTrip)
+        unpacked_requestType, unpacked_code, unpacked_checksum, unpacked_id, unpacked_sequence = struct.unpack("bbHHh",
+                                                                                                               header)
+        if myID == unpacked_id:
+            bytes = struct.calcsize('d')
+            # get the sequence value which is returned
+            # in the echo reply
+            sequenceValue = struct.unpack('d', recPacket[28:28 + bytes])[0]
+            # add it to the log
+            totalTime = timeReceived - sequenceValue
+            roundTripTimeLog.append(totalTime)
+            received += 1
+            return totalTime
+        else:
+            # the ids don't match
+            return "0: IP Header Bad"
         # Fill in end
         timeLeft = timeLeft - howLongInSelect
         if timeLeft <= 0:
@@ -75,6 +80,7 @@ def receiveOnePing(mySocket, ID, timeout, destAddr):
 def sendOnePing(mySocket, destAddr, ID):
     # Header is type (8), code (8), checksum (16), id (16), sequence (16)
 
+    global sent
     myChecksum = 0
     # Make a dummy header with a 0 checksum
     # struct -- Interpret strings as packed binary data
@@ -96,7 +102,7 @@ def sendOnePing(mySocket, destAddr, ID):
     packet = header + data
 
     mySocket.sendto(packet, (destAddr, 1))  # AF_INET address must be tuple, not str
-
+    sent += 1
 
     # Both LISTS and TUPLES consist of a number of objects
     # which can be referenced by their position number within the object.
@@ -119,11 +125,7 @@ def doOnePing(destAddr, timeout):
 
 def ping(host, timeout=1):
     # timeout=1 means: If one second goes by without a reply from the server,  	# the client assumes that either the client's ping or the server's pong is lost
-    global roundTrip_min, roundTrip_max, roundTrip_sum, roundTrip_cnt
-    roundTrip_min = float('+inf')
-    roundTrip_max = float('-inf')
-    roundTrip_sum = 0
-    roundTrip_cnt = 0
+    
     dest = gethostbyname(host)
     print("Pinging " + dest + " using Python:")
     print("")
