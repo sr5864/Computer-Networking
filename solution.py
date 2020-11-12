@@ -64,7 +64,7 @@ def receiveOnePing(mySocket, ID, timeout, destAddr):
         ip_pkt_head = struct.unpack('!BBHHHBBH4s4s', recPacket[:20])
         ttl = ip_pkt_head[5]
         length = len(recPacket) - 20
-        return '{} bytes from {}: icmp_seq={} ttl={} time={:.3f} ms'.format(length, saddr, seq, ttl, roundTrip)
+        return '{} bytes from {}: icmp_seq={} ttl={} time={:.3f} ms'.format(length, seq, ttl, roundTrip)
         # Fill in end
         timeLeft = timeLeft - howLongInSelect
         if timeLeft <= 0:
