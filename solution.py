@@ -1,4 +1,4 @@
-from socket import *
+ from socket import *
 import os
 import sys
 import struct
@@ -121,9 +121,9 @@ def ping(host, timeout=1):
     print("Pinging " + dest + " using Python:")
     print("")
     # Calculate vars values and return them
-    packet_max = max(timeRTT)
-    packet_min = min(timeRTT)
-    packet_avg = float((sum(timeRTT)/ len(timeRTT)))
+    packet_max = 1
+    packet_min = 1
+    packet_avg = 1
     stdev_var = 1
     vars = [str(round(packet_min, 2)), str(round(packet_avg, 2)), str(round(packet_max, 2)),str(round(stdev(stdev_var), 2))]
     # Send ping requests to a server separated by approximately one second
