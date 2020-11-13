@@ -53,7 +53,7 @@ def receiveOnePing(mySocket, ID, timeout, destAddr):
         type, code, checksum, packetID, sequence = struct.unpack("bbHHh", icmpHeader)
         if packetID == ID:
             bytesInDouble = struct.calcsize("d")
-            timeSent = struct.unpack("d", recPacket[28:28 + bytesInDouble])
+            timeSent = struct.unpack("d", recPacket[28:28 + bytesInDouble])[0]
             return (timeReceived * 1000) - (timeSent * 1000)
 
 
