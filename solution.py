@@ -5,7 +5,7 @@ import struct
 import time
 import select
 import binascii
-from statistics import stdev 
+from statistics import stdev
 # Should use stdev
 timeRTT = []
 packageSent = 0
@@ -115,6 +115,7 @@ def doOnePing(destAddr, timeout):
 
 
 def ping(host, timeout=1):
+    global packageRev, timeRTT
     # timeout=1 means: If one second goes by without a reply from the server,  	# the client assumes that either the client's ping or the server's pong is lost
     dest = gethostbyname(host)
     print("Pinging " + dest + " using Python:")
