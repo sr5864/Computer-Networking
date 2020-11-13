@@ -5,7 +5,11 @@ import struct
 import time
 import select
 import binascii
+from statistics import stdev 
 # Should use stdev
+timeRTT = []
+packageSent = 0
+packageRev = 0
 
 ICMP_ECHO_REQUEST = 8
 
@@ -35,6 +39,7 @@ def checksum(string):
 
 
 def receiveOnePing(mySocket, ID, timeout, destAddr):
+    global packageRev, timeRTT
     timeLeft = timeout
 
     while 1:
@@ -55,6 +60,8 @@ def receiveOnePing(mySocket, ID, timeout, destAddr):
         if type != 8 and packetID == ID:
             bytesInDouble = struct.calcsize("d")
             timeSent = struct.unpack("d", recPacket[28:28 + bytesInDouble])[0]
+            timeRTT.append(timeReceived - timeData)
+            packageRev += 1
             return timeReceived - timeSent
 
 
@@ -113,6 +120,10 @@ def ping(host, timeout=1):
     print("Pinging " + dest + " using Python:")
     print("")
     # Calculate vars values and return them
+    packet_max = max(timeRTT)
+    packet_min = min(timeRTT)
+    packet_avg = float((sum(timeRTT)/ len(timeRTT)))
+    stdev_var = 1
     vars = [str(round(packet_min, 2)), str(round(packet_avg, 2)), str(round(packet_max, 2)),str(round(stdev(stdev_var), 2))]
     # Send ping requests to a server separated by approximately one second
     for i in range(0,4):
