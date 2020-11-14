@@ -118,6 +118,7 @@ def ping(host, timeout=1):
     print("")
     # Calculate vars values and return them
     myID = os.getpid() & 0xFFFF
+    myChecksum = 0
     header = struct.pack("bbHHh", ICMP_ECHO_REQUEST, 0, myChecksum, myID, 1)
 
 
