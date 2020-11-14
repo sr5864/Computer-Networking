@@ -7,9 +7,7 @@ import select
 import binascii
 from statistics import stdev
 # Should use stdev
-timeRTT = []
-packageSent = 0
-packageRev = 0
+
 
 ICMP_ECHO_REQUEST = 8
 
@@ -39,7 +37,6 @@ def checksum(string):
 
 
 def receiveOnePing(mySocket, ID, timeout, destAddr):
-    global packageRev, timeRTT
     timeLeft = timeout
 
     while 1:
@@ -55,13 +52,13 @@ def receiveOnePing(mySocket, ID, timeout, destAddr):
         # Fill in start
 
         # Fetch the ICMP header from the IP packet
-        header = recPacket[20:28]
-        type, code, checksum, packetID, sequence = struct.unpack('bbHHh', header)
+        icmpHeader = recPacket[20:28]
+        type, code, checksum, packetID, sequence = struct.unpack(
+            "bbHHh", icmpHeader
+        )
         if type != 8 and packetID == ID:
             bytesInDouble = struct.calcsize("d")
             timeSent = struct.unpack("d", recPacket[28:28 + bytesInDouble])[0]
-            timeRTT.append(timeReceived - timeData)
-            packageRev += 1
             return timeReceived - timeSent
 
 
@@ -115,15 +112,22 @@ def doOnePing(destAddr, timeout):
 
 
 def ping(host, timeout=1):
-    global packageRev, timeRTT
     # timeout=1 means: If one second goes by without a reply from the server,  	# the client assumes that either the client's ping or the server's pong is lost
     dest = gethostbyname(host)
     print("Pinging " + dest + " using Python:")
     print("")
     # Calculate vars values and return them
-    packet_max = 1
-    packet_min = 1
-    packet_avg = 1
+    myID = os.getpid() & 0xFFFF
+    header = struct.pack("bbHHh", ICMP_ECHO_REQUEST, 0, myChecksum, myID, 1)
+
+
+    packet_max = 0
+    if len(header) > packet_max:
+            packet_max = len(header)
+    packet_min = 65,535
+    if len(header) < packet_min:
+        packet_min = len(header)
+    packet_avg =+ len(header)
     stdev_var = 1
     vars = [str(round(packet_min, 2)), str(round(packet_avg, 2)), str(round(packet_max, 2)),str(round(stdev(stdev_var), 2))]
     # Send ping requests to a server separated by approximately one second
