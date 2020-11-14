@@ -124,7 +124,7 @@ def ping(host, timeout=1):
         delay = doOnePing(dest, timeout)*1000
         print(delay)
         time.sleep(1)  # one second
-        packetList[i] = delay
+        packetList.append(delay)
 
     packet_avg = statistics.mean(packetList)
     stdev = statistics.stdev(packetList)
