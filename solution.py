@@ -52,7 +52,7 @@ def build_packet():
     # Append checksum to the header.
     myChecksum = checksum(header + data)
     if sys.platform == 'darwin':
-        myChecksum = socket.htons(myChecksum) & 0xffff
+        myChecksum = htons(myChecksum) & 0xffff
         # Convert 16-bit integers from host to network byte order.
     else:
         myChecksum = htons(myChecksum)
