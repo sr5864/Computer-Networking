@@ -10,7 +10,6 @@ ICMP_ECHO_REQUEST = 8
 MAX_HOPS = 30
 TIMEOUT = 2.0
 TRIES = 1
-allTraces = []
 # The packet that we shall send to each router along the path is the ICMP echo
 # request packet, which is exactly what we had used in the ICMP ping exercise.
 # We shall use the same packet that we built in the Ping exercise
@@ -95,7 +94,7 @@ def get_route(hostname):
                     tracelist1.append("* * * Request timed out.")
                     #Fill in start
                     #You should add the list above to your all traces list
-                    allTraces.append(tracelist1)
+                    tracelist2.append(tracelist1)
                     #Fill in end
                 recvPacket, addr = mySocket.recvfrom(1024)
                 timeReceived = time.time()
@@ -104,7 +103,7 @@ def get_route(hostname):
                     tracelist1.append("* * * Request timed out.")
                     #Fill in start
                     #You should add the list above to your all traces list
-                    allTraces.append(tracelist1)
+                    tracelist2.append(tracelist1)
                     #Fill in end
             except timeout:
                 continue
@@ -131,7 +130,7 @@ def get_route(hostname):
                     #Fill in start
                     #You should add your responses to your lists here
                     tracelist1.append(" %d rtt = %.0f ms  %s"  %(ttl,(timeReceived - t) *1000 , addr[0]))
-                    allTraces.append(tracelist1)
+                    tracelist2.append(tracelist1)
                     #Fill in end
                 elif types == 3:
                     bytes = struct.calcsize("d")
@@ -139,7 +138,7 @@ def get_route(hostname):
                     #Fill in start
                     #You should add your responses to your lists here
                     tracelist1.append(" %d rtt = %.0f ms  %s" % (ttl, (timeReceived - t) * 1000, addr[0]))
-                    allTraces.append(tracelist1)
+                    tracelist2.append(tracelist1)
                     #Fill in end
                 elif types == 0:
                     bytes = struct.calcsize("d")
@@ -147,13 +146,13 @@ def get_route(hostname):
                     #Fill in start
                     #You should add your responses to your lists here and return your list if your destination IP is met
                     tracelist1.append(" %d rtt = %.0f ms  %s" % (ttl, (timeReceived - t) * 1000, addr[0]))
-                    allTraces.append(tracelist1)
+                    tracelist2.append(tracelist1)
                     #Fill in end
                 else:
                     #Fill in start
                     #If there is an exception/error to your if statements, you should append that to your list here
                     tracelist1.append("error")
-                    allTraces.append(tracelist1)
+                    tracelist2.append(tracelist1)
                     #Fill in end
                 break
             finally:
