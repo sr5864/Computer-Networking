@@ -46,18 +46,18 @@ def build_packet():
 
     # Make the header in a similar way to the ping exercise.
     myChecksum = 0
-    myID = os.getpid() & 0xFFFF
-    header = struct.pack("bbHHh", ICMP_ECHO_REQUEST, 0, myChecksum, myID, 1)
+    # myID = os.getpid() & 0xFFFF
+    header = struct.pack("bbHh", ICMP_ECHO_REQUEST, 0, myChecksum, 1)
     data = struct.pack("d", time.time())
     # Append checksum to the header.
-    myChecksum = checksum(header + data)
+    myChecksum = checksum(str(header + data))
     if sys.platform == 'darwin':
         myChecksum = htons(myChecksum) & 0xffff
         # Convert 16-bit integers from host to network byte order.
     else:
         myChecksum = htons(myChecksum)
 
-    header = struct.pack("bbHHh", ICMP_ECHO_REQUEST, 0, myChecksum, myID, 1)
+    header = struct.pack("bbHHh", ICMP_ECHO_REQUEST, 0, myChecksum, (os.getpid() & 0xFFFF), 1)
 
     # Don’t send the packet yet , just return the final packet in this function.
     #Fill in end
