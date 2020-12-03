@@ -129,13 +129,13 @@ def get_route(hostname):
                 # Fetch the icmp type from the IP packet
                 icmpHeader = recvPacket[20:28]
                 types, code, checksum, packetID, sequence = struct.unpack("bbHHh", icmpHeader)
-                print(types)
+                # print(types)
                 # Fill in end
                 try:  # try to fetch the hostname
                     # Fill in start
                     dest_name = gethostbyaddr(addr[0])
                     tracelist1.append(dest_name)
-                    tracelist2.append(dest_name)
+                    tracelist2.append(tracelist1)
                     # Fill in end
                 except herror:  # if the host does not provide a hostname
                     # Fill in start
