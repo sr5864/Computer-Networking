@@ -131,13 +131,13 @@ def get_route(hostname):
                 types, code, checksum, packetID, sequence = struct.unpack("bbHHh", icmpHeader)
                 print(types)
                 # Fill in end
-                # try:  # try to fetch the hostname
+                try:  # try to fetch the hostname
                     # Fill in start
-                    # destAddr = gethostbyname(hostname)
+                    destAddr = gethostbyname(hostname)
                     # Fill in end
-                # except herror:  # if the host does not provide a hostname
+                except herror:  # if the host does not provide a hostname
                     # Fill in start
-                    # pass
+                    pass
                     # Fill in end
 
                 if types == 11:
