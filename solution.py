@@ -120,6 +120,7 @@ def get_route(hostname):
                     tracelist1.append("* * * Request timed out.")
                     # Fill in start
                     # You should add the list above to your all traces list
+                    tracelist2.append(tracelist1)
                     # Fill in end
             except timeout:
                 continue
@@ -144,8 +145,7 @@ def get_route(hostname):
 
                 if types == 11:
                     bytes = struct.calcsize("d")
-                    timeSent = struct.unpack("d", recvPacket[28:28 +
-                                                                bytes])[0]
+                    timeSent = struct.unpack("d", recvPacket[28:28 + bytes])[0]
                     # Fill in start
                     # You should add your responses to your lists here
                     tracelist1.append((str(ttl), str(round((timeReceived - t) * 1000))+"ms", addr[0],ip_to_host(addr[0]), dest_name))
