@@ -70,62 +70,60 @@ def build_packet():
 
 def get_route(hostname):
     timeLeft = TIMEOUT
-    tracelist1 = [] #This is your list to use when iterating through each trace
-    tracelist2 = [] #This is your list to contain all traces
-
     for ttl in range(1,MAX_HOPS):
         for tries in range(TRIES):
-            destAddr = gethostbyname(hostname)
-
+            destAddr = socket.gethostbyname(hostname)
+            
             #Fill in start
             # Make a raw socket named mySocket
-            # Make a raw socket named mySocket
-            icmp = getprotobyname('icmp')
-            # mySocket = socket.socket(socket.AF_INET, socket.SOCK_RAW, icmp)
-            mySocket = socket(AF_INET, SOCK_DGRAM, icmp)
+            icmp = socket.getprotobyname("icmp")
+            #mySocket = socket.socket(socket.AF_INET, socket.SOCK_RAW, icmp)
+            mySocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, icmp)
             #Fill in end
-
-            mySocket.setsockopt(IPPROTO_IP, IP_TTL, struct.pack('I', ttl))
+            
+            mySocket.setsockopt(socket.IPPROTO_IP, socket.IP_TTL, struct.pack('I', ttl))
             mySocket.settimeout(TIMEOUT)
             try:
                 d = build_packet()
                 mySocket.sendto(d, (hostname, 0))
-                t= time.time()
+                t = time.time()
                 startedSelect = time.time()
                 whatReady = select.select([mySocket], [], [], timeLeft)
                 howLongInSelect = (time.time() - startedSelect)
+
                 if whatReady[0] == []: # Timeout
-                    tracelist1.append("* * * Request timed out.")
+                    print ("*    *    * Request timed out.")
+
                 recvPacket, addr = mySocket.recvfrom(1024)
-                tracelist1.append(addr)
+                print (addr)
                 timeReceived = time.time()
                 timeLeft = timeLeft - howLongInSelect
-                if timeLeft <= 0:
-                    tracelist1.append("* * * Request timed out.")
 
-            except timeout:
+                if timeLeft <= 0:
+                    print ("*    *    * Request timed out.")
+
+            except socket.timeout:
                 continue
 
             else:
                 icmpHeader = recvPacket[20:28]
                 request_type, code, checksum, packetID, sequence = struct.unpack("bbHHh", icmpHeader)
 
-                if types == 11:
+                if request_type == 11:
                     bytes = struct.calcsize("d")
                     timeSent = struct.unpack("d", recvPacket[28:28 + bytes])[0]
-                    tracelist1.append(" %d   rtt=%.0f ms %s" % (ttl, (timeReceived - t) * 1000, addr[0]))
-                elif types == 3:
+                    print (" %d   rtt=%.0f ms %s" % (ttl,(timeReceived -t)*1000, addr[0]))
+                elif request_type == 3:
                     bytes = struct.calcsize("d")
                     timeSent = struct.unpack("d", recvPacket[28:28 + bytes])[0]
-                    tracelist1.append(" %d   rtt=%.0f ms %s" % (ttl, (timeReceived - t) * 1000, addr[0]))
-                elif types == 0:
+                    print (" %d   rtt=%.0f ms %s" % (ttl,(timeReceived -t)*1000, addr[0]))
+                elif request_type == 0:
                     bytes = struct.calcsize("d")
                     timeSent = struct.unpack("d", recvPacket[28:28 + bytes])[0]
-                    tracelist1.append(" %d   rtt=%.0f ms %s" % (ttl, (timeReceived - timeSent) * 1000, addr[0]))
+                    print (" %d   rtt=%.0f ms %s" % (ttl,(timeReceived -timeSent)*1000, addr[0]))
                     return
                 else:
-                    tracelist1.append("error")
-
+                    print ("error")
                     break
             finally:
                 mySocket.close()
