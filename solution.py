@@ -47,23 +47,25 @@ def build_packet():
     myChecksum = 0
     myID = os.getpid() & 0xFFFF
     header = struct.pack("bbHHh", ICMP_ECHO_REQUEST, 0, myChecksum, myID, 1)
+    # header = struct.pack("!HHHHH", ICMP_ECHO_REQUEST, 0, myChecksum, pid, 1)
     data = struct.pack("d", time.time())
     # Append checksum to the header.
     myChecksum = checksum(header + data)
     if sys.platform == 'darwin':
-        myChecksum = htons(myChecksum) & 0xffff
+        myChecksum = socket.htons(myChecksum) & 0xffff
         # Convert 16-bit integers from host to network byte order.
     else:
         myChecksum = htons(myChecksum)
 
-    header = struct.pack("bbHHh", ICMP_ECHO_REQUEST, 0, myChecksum, myID, 1)
+    header = struct.pack("bbHHh", ICMP_ECHO_REQUEST, 0, myChecksum, myID,1)
 
-    # Don’t send the packet yet , just return the final packet in this function.
+                         # Don’t send the packet yet , just return the final packet in this function.
     #Fill in end
 
     # So the function ending should look like this
 
     packet = header + data
+
     return packet
 
 def get_route(hostname):
@@ -77,9 +79,10 @@ def get_route(hostname):
 
             #Fill in start
             # Make a raw socket named mySocket
-            icmp = getprotobyname("icmp")
-            # mySocket = socket.socket(socket.AF_INET, socket.SOCK_RAW, icmp)
-            mySocket = socket(AF_INET, SOCK_RAW, icmp)
+            # Make a raw socket named mySocket
+            icmp = getprotobyname('icmp')
+            mySocket = socket.socket(socket.AF_INET, socket.SOCK_RAW, icmp)
+            # mySocket = socket(AF_INET, SOCK_DGRAM, icmp)
             #Fill in end
 
             mySocket.setsockopt(IPPROTO_IP, IP_TTL, struct.pack('I', ttl))
@@ -87,11 +90,11 @@ def get_route(hostname):
             try:
                 d = build_packet()
                 mySocket.sendto(d, (hostname, 0))
-                t = time.time()
+                t= time.time()
                 startedSelect = time.time()
                 whatReady = select.select([mySocket], [], [], timeLeft)
                 howLongInSelect = (time.time() - startedSelect)
-                if whatReady[0] == []:  # Timeout
+                if whatReady[0] == []: # Timeout
                     tracelist1.append("* * * Request timed out.")
                 recvPacket, addr = mySocket.recvfrom(1024)
                 tracelist1.append(addr)
@@ -105,7 +108,7 @@ def get_route(hostname):
 
             else:
                 icmpHeader = recvPacket[20:28]
-                types, code, checksum, packetID, sequence = struct.unpack("bbHHh", icmpHeader)
+                request_type, code, checksum, packetID, sequence = struct.unpack("bbHHh", icmpHeader)
 
                 if types == 11:
                     bytes = struct.calcsize("d")
