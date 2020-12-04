@@ -141,7 +141,9 @@ def get_route(hostname):
                     # Fill in end
                 except herror:  # if the host does not provide a hostname
                     # Fill in start
-                    pass
+                    # pass
+                    tracelist1.append("* * * Hostname Error")
+                    tracelist2.append(tracelist1)
                     # Fill in end
 
                 if types == 11:
