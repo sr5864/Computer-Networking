@@ -105,7 +105,7 @@ def get_route(hostname):
                     # Fill in end
                 except herror:  # if the host does not provide a hostname
                     # Fill in start
-                    tracelist1.append("Hostname Error")
+                    tracelist1.append("hostname not returnable")
                     tracelist2.append(tracelist1)
                 # Fill in end
                 if types == 11:
@@ -136,7 +136,7 @@ def get_route(hostname):
                 else:
                     # Fill in start
                     # If there is an exception/error to your if statements, you should append that to your list here
-                    tracelist1.append("Error")
+                    tracelist1.append("Request timed out.")
                     tracelist2.append(tracelist1)
                     return tracelist2
                     # Fill in end
